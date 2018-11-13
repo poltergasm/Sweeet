@@ -6,26 +6,9 @@ char plytime[25] = "Playing for: ";
 static struct player_s {
 	union {
 		s_entity ent;
-		s_entity_dynamic dynamic_ent;
 	} base;
-	s_quad Dance[12];
-	s_quad Sprite;
 };
 struct player_s player;
-
-static struct chibi_s {
-	int x;
-	int y;
-	int Tick;
-	int Frame;
-	int Step;
-	char *State;
-	s_image Image;
-	s_quad Walk[4];
-	s_quad Wink[3];
-	s_quad Sprite;
-};
-struct chibi_s chibi;
 
 static struct cube_s {
 	int x;
@@ -48,35 +31,23 @@ static void s_load()
 	// set up the player
 	player.base.ent.x = 64;
 	player.base.ent.y = 64;
-	player.base.dynamic_ent.Tick = 0;
-	player.base.dynamic_ent.Frame = 0;
-	player.base.dynamic_ent.Step = 7;
-	player.base.dynamic_ent.State = "Dance";
-	player.base.dynamic_ent.Image = s_load_image("reimu.png");
-	player.Dance[0] = s_new_quad(0, 0, 172, 208);
-	player.Dance[1] = s_new_quad(172, 0, 172, 208);
-	player.Dance[2] = s_new_quad(344, 0, 172, 208);
-	player.Dance[3] = s_new_quad(516, 0, 172, 208);
-	player.Dance[4] = s_new_quad(688, 0, 172, 208);
-	player.Dance[5] = s_new_quad(860, 0, 172, 208);
-	player.Dance[6] = s_new_quad(0, 208, 172, 208);
-	player.Dance[7] = s_new_quad(172, 208, 172, 208);
-	player.Dance[8] = s_new_quad(344, 208, 172, 208);
-	player.Dance[9] = s_new_quad(516, 208, 172, 208);
-	player.Dance[10] = s_new_quad(688, 208, 172, 208);
-	
-	chibi.x = 800;
-	chibi.y = 450;
-	chibi.Tick = 0;
-	chibi.Frame = 0;
-	chibi.Step = 11;
-	chibi.State = "Walk";
-	chibi.Image = s_load_image("chibi.png");
-	chibi.Walk[0] = s_new_quad(1110, 0, 185, 189);
-	chibi.Walk[1] = s_new_quad(1295, 0, 185, 189);
-	chibi.Walk[2] = s_new_quad(1480, 0, 185, 189);
-	chibi.Wink[0] = s_new_quad(185, 378, 185, 189);
-	chibi.Wink[1] = s_new_quad(370, 378, 160, 189);
+	player.base.ent.Tick = 0;
+	player.base.ent.Frame = 0;
+	player.base.ent.Step = 7;
+	player.base.ent.State = 0;
+	player.base.ent.Image = s_load_image("reimu.png");
+	player.base.ent.States[0][0] = s_new_quad(0, 0, 172, 208);
+	player.base.ent.States[0][1] = s_new_quad(172, 0, 172, 208);
+	player.base.ent.States[0][2] = s_new_quad(344, 0, 172, 208);
+	player.base.ent.States[0][3] = s_new_quad(516, 0, 172, 208);
+	player.base.ent.States[0][4] = s_new_quad(688, 0, 172, 208);
+	player.base.ent.States[0][5] = s_new_quad(860, 0, 172, 208);
+	player.base.ent.States[0][6] = s_new_quad(0, 208, 172, 208);
+	player.base.ent.States[0][7] = s_new_quad(172, 208, 172, 208);
+	player.base.ent.States[0][8] = s_new_quad(344, 208, 172, 208);
+	player.base.ent.States[0][9] = s_new_quad(516, 208, 172, 208);
+	player.base.ent.States[0][10] = s_new_quad(688, 208, 172, 208);
+	s_ent_mgr.add(&player.base.ent);
 
 	// the cube, which is really a square. whatever.
 	cube.x = 300;
@@ -99,29 +70,7 @@ static void s_tick()
 		sprintf(plytime, "Playing for: %.2f", (double)dur_t / CLOCKS_PER_SEC);
 	}
 
-	// this block handles alternating the frames to 
-	// make sprites look like they are moving
-	if (strcmp(player.base.dynamic_ent.State, "Dance") == 0) {
-		player.base.dynamic_ent.Tick = (player.base.dynamic_ent.Tick+1) % player.base.dynamic_ent.Step;
-		if (player.base.dynamic_ent.Tick == 0) {
-			player.base.dynamic_ent.Frame = player.base.dynamic_ent.Frame % 11 +1;
-			player.Sprite = player.Dance[player.base.dynamic_ent.Frame-1];
-		}
-	}
-
-	if (strcmp(chibi.State, "Walk") == 0) {
-		chibi.Tick = (chibi.Tick+1) % chibi.Step;
-		if (chibi.Tick == 0) {
-			chibi.Frame = chibi.Frame % 3 +1;
-			chibi.Sprite = chibi.Walk[chibi.Frame-1];
-		}
-	} else if (strcmp(chibi.State, "Wink") == 0) {
-		chibi.Tick = (chibi.Tick+1) % chibi.Step;
-		if (chibi.Tick == 0) {
-			chibi.Frame = chibi.Frame % 2 +1;
-			chibi.Sprite = chibi.Wink[chibi.Frame-1];
-		}
-	}
+	s_ent_mgr.tick();
 
 	// yeah, no spectacular easing here so fuck you
 	if (move_cube) {
@@ -156,23 +105,8 @@ static void s_tick()
 		move_cube = true;
 	}
 
-	if (chibi_move && (strcmp(chibi.State, "Wink") != 0)) {
-		if (chibi.x > 25) {
-			if (clock()+1 > chibi_t) {
-				chibi.x--;
-				chibi_t = clock();
-			}
-		} else {
-			chibi.State = "Wink";
-		}
-	}
-
 	if (timer > 33) {
 		cube.Stage = 2;
-	}
-
-	if (timer > 5) {
-		chibi_move = true;
 	}
 }
 
@@ -183,8 +117,7 @@ static void s_render()
 	s_rect(400, 10, 300, 40, 8, 255);
 	s_print(plytime, 412, 17, 0);
 	s_print(plytime, 410, 15, 7);
-	s_draw_quad(player.base.dynamic_ent.Image, 64, 64, false, player.Sprite);
-	s_draw_quad(chibi.Image, chibi.x, chibi.y, false, chibi.Sprite);
+	s_draw_quad(player.base.ent.Image, 64, 64, false, player.base.ent.Sprite);
 	s_rect(cube.x, cube.y, cube.w, cube.h, cube.Color, 255);
 }
 

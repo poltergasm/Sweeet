@@ -51,6 +51,8 @@ void s_init(s_window *win)
             fprintf(stderr, "Failed to open audio channel\n");
             exit(1);
         }
+
+        s_ent_mgr_init();
         sweeet.Running = true;
 
         // set the initial color
