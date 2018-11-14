@@ -36,6 +36,7 @@ static void s_load()
 	player.base.ent.Step = 7;
 	player.base.ent.State = 0;
 	player.base.ent.Image = s_load_image("reimu.png");
+
 	player.base.ent.States[0][0] = s_new_quad(0, 0, 172, 208);
 	player.base.ent.States[0][1] = s_new_quad(172, 0, 172, 208);
 	player.base.ent.States[0][2] = s_new_quad(344, 0, 172, 208);
@@ -47,6 +48,9 @@ static void s_load()
 	player.base.ent.States[0][8] = s_new_quad(344, 208, 172, 208);
 	player.base.ent.States[0][9] = s_new_quad(516, 208, 172, 208);
 	player.base.ent.States[0][10] = s_new_quad(688, 208, 172, 208);
+
+	/*player.base.ent.States[1][0] = s_new_quad(0, 0, 172, 208);
+	player.base.ent.States[1][1] = s_new_quad(172, 0, 172, 208);*/
 	s_ent_mgr.add(&player.base.ent);
 
 	// the cube, which is really a square. whatever.
@@ -58,8 +62,8 @@ static void s_load()
 	cube.Color = 13;
 
 	// play some sick beats
-	s_sound itvara_sng = s_load_sound("fractal_itvara.ogg", true);
-	s_play(itvara_sng);
+	//s_sound itvara_sng = s_load_sound("fractal_itvara.ogg", true);
+	//s_play(itvara_sng);
 }
 
 
